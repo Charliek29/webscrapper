@@ -1,50 +1,37 @@
-# web image scraper and finder
 from bs4 import BeautifulSoup
 import urllib.parse as urlparse
-import time
-from selenium import webdriver
-import platform
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from webdriver_manager.chrome import ChromeDriverManager
-
-def load_website(site: str):
-    print(f'Starting scrape of {site[:70]}')
-    # TODO FIX THIS PART USING THESE LINKS BELOW
-    # https://stackoverflow.com/questions/41501636/how-to-install-pip3-on-windows
-    # https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-has-been-deprecated-selenium-python
-    # https://stackoverflow.com/questions/42524114/how-to-install-geckodriver-on-a-windows-system
-    if "macOS" in platform.platform():
+import requests
+from fake_useragent import UserAgent
 
 
-        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+def load_website(url: str):
+    print(f'Starting scrape of {url[:70]}')
+    ua = UserAgent()
+    header = {'User-Agent': str(ua.chrome)}
+    html = requests.get(url, headers=header)
+    if html.status_code == 200:
+        return BeautifulSoup(html.text, 'html.parser')
     else:
-        browser = webdriver.Edge(executable_path=r"msedgedriver.exe")
-    browser.get(site)
-    html = browser.page_source
-    time.sleep(2)
-    # close web browser
-    browser.close()
-    browser.quit()
-    return BeautifulSoup(html, 'html.parser') # TODO make sure this return is correct with multiple images
-        
+        return None
+
 
 def find_all_images(url: str, bs_object: BeautifulSoup):
     print(f'Getting all images from {url[:70]}')
     imgs = bs_object.find_all('img')
     images_links = {}
     alt_set = set()
-    
+
     for idx, tag in enumerate(imgs):
-        if tag['alt'] not in alt_set:
+        dic = tag.attrs
+        if 'alt' in dic.keys() and tag['alt'] not in alt_set:
             alt_set.add(tag['alt'])
-            images_links[tag['alt']] = urlparse.urljoin(url, tag['src']) 
+            images_links[tag['alt']] = urlparse.urljoin(url, tag['src'])
         else:
-           images_links[(tag['alt']+str(idx))] = urlparse.urljoin(url, tag['src']) 
+            images_links[("unlabeled " + str(idx))] = urlparse.urljoin(url, tag['src'])
     return images_links
 
 
-def find_all_links(url:str, bs_object: BeautifulSoup):
+def find_all_links(url: str, bs_object: BeautifulSoup):
     print(f'Looking for new links from {url[:70]}')
     links = bs_object.find_all('a')
     link_dic = {}
@@ -58,13 +45,14 @@ def find_all_links(url:str, bs_object: BeautifulSoup):
 def display_image(img: str):
     pass
 
+
 # make this multi-thread, one for searching for new links, one for getting images, one for viewer of images
 if __name__ == "__main__":
     test = "https://www.google.com"
     # load_website(test)
     site = load_website(test)
-    print(site.prettify())
-    # img_w_url = find_all_images(test, site)
-    # print(len(img_w_url))
+    # print(site.prettify())
+    img_w_url = find_all_images(test, site)
+    print(img_w_url)
     # new_links = find_all_links(test, site)
     # print(new_links)
