@@ -32,6 +32,7 @@ def find_all_images(url: str, bs_object: BeautifulSoup):
 
 
 def find_all_links(url: str, bs_object: BeautifulSoup):
+    # TODO add more logic here to check if the links are valid (using requests or another library)
     print(f'Looking for new links from {url[:70]}')
     links = bs_object.find_all('a')
     link_dic = {}
@@ -53,6 +54,5 @@ if __name__ == "__main__":
     site = load_website(test)
     # print(site.prettify())
     img_w_url = find_all_images(test, site)
-    print(img_w_url)
-    # new_links = find_all_links(test, site)
-    # print(new_links)
+    new_links = find_all_links(test, site)
+    print(new_links)
