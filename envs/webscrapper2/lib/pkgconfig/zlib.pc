@@ -1,0 +1,13 @@
+prefix=/Users/charlie/opt/anaconda3/envs/webscrapper
+exec_prefix=/Users/charlie/opt/anaconda3/envs/webscrapper
+libdir=/Users/charlie/opt/anaconda3/envs/webscrapper/lib
+sharedlibdir=/Users/charlie/opt/anaconda3/envs/webscrapper/lib
+includedir=/Users/charlie/opt/anaconda3/envs/webscrapper/include
+
+Name: zlib
+Description: zlib compression library
+Version: 1.2.12
+
+Requires:
+Libs: -L${libdir} -L${sharedlibdir} -lz
+Cflags: -I${includedir}

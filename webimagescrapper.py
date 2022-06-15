@@ -1,11 +1,12 @@
 # web image scraper and finder
-from bs4 import BeautifulSoup 
-import requests
-import os
+from bs4 import BeautifulSoup
 import urllib.parse as urlparse
 import time
 from selenium import webdriver
-
+import platform
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
 
 def load_website(site: str):
     print(f'Starting scrape of {site[:70]}')
@@ -13,7 +14,12 @@ def load_website(site: str):
     # https://stackoverflow.com/questions/41501636/how-to-install-pip3-on-windows
     # https://stackoverflow.com/questions/64717302/deprecationwarning-executable-path-has-been-deprecated-selenium-python
     # https://stackoverflow.com/questions/42524114/how-to-install-geckodriver-on-a-windows-system
-    browser = webdriver.Edge("F:\Downloads\edgedriver_win32\msedgedriver.exe")
+    if "macOS" in platform.platform():
+
+
+        driver = webdriver.Chrome(service=Service(ChromeDriverManager().install()))
+    else:
+        browser = webdriver.Edge(executable_path=r"msedgedriver.exe")
     browser.get(site)
     html = browser.page_source
     time.sleep(2)
@@ -54,7 +60,7 @@ def display_image(img: str):
 
 # make this multi-thread, one for searching for new links, one for getting images, one for viewer of images
 if __name__ == "__main__":
-    test = "https://www.duolingo.com"
+    test = "https://www.google.com"
     # load_website(test)
     site = load_website(test)
     print(site.prettify())
