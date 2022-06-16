@@ -1,7 +1,9 @@
+from time import sleep
 from bs4 import BeautifulSoup
 import urllib.parse as urlparse
 import requests
 from fake_useragent import UserAgent
+from random import randint
 
 
 def load_website(url: str):
@@ -48,7 +50,19 @@ def find_all_links(url: str, bs_object: BeautifulSoup):
 
 
 def display_image(img: str):
-    pass
+    print(f'loading image from this URL: {img}')
+    response = requests.get(img)
+    file = open("temp_img.png", "wb")
+    file.write(response.content)
+    sleep(1)
+    file.close()
+
+
+def manager(curr_dic: dict):
+    vals = list(curr_dic.values())
+    while len(vals) > 0:
+        choice = randint(0, len(vals)-1)
+        display_image(vals.pop(choice))
 
 
 # make this multi-thread, one for searching for new links, one for getting images, one for viewer of images
@@ -59,4 +73,4 @@ if __name__ == "__main__":
     # print(site.prettify())
     img_w_url = find_all_images(test, site)
     new_links = find_all_links(test, site)
-    print(new_links)
+    manager(img_w_url)
