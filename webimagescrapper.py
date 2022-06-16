@@ -38,8 +38,12 @@ def find_all_links(url: str, bs_object: BeautifulSoup):
     link_dic = {}
     for tag in links:
         link = tag['href']
-        name = tag.text
-        link_dic[name] = link
+        try:
+            if requests.get(link).status_code == 200:
+                name = tag.text
+                link_dic[name] = link
+        except:
+            continue
     return link_dic
 
 
