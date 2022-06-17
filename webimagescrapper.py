@@ -24,24 +24,17 @@ def find_all_images(url: str, bs_object: BeautifulSoup):
     print(f'Getting all images from {url[:70]}')
     html = bs_object.prettify()
     # pat = re.compile(r'<img [^>]*src="([^"]+)')
-    pat = re.compile(r'<img (?:alt)?.*\"(http[\_A-Za-z0-9.\/\-\:\?=]*)\".*\/>')
+    pat = re.compile(r'<img (?:alt)?.*\"(http[^\"]*)\".*\/>')
     img = pat.findall(html)
     return img
 
 
 def find_all_links(url: str, bs_object: BeautifulSoup):
     print(f'Looking for new links from {url[:70]}')
-    links = bs_object.find_all('a')
-    link_dic = {}
-    for tag in links:
-        try:
-            link = tag['href']
-            if requests.get(link).status_code == 200:
-                name = tag.text
-                link_dic[name] = link
-        except:
-            continue
-    return link_dic
+    html = bs_object.prettify()
+    # print(html)
+    pat = re.compile(r'<a.*href=\"(http[^\"]*)\".*>')
+    return pat.findall(html)
 
 
 def display_image(link_to_photo: str):
@@ -73,5 +66,6 @@ if __name__ == "__main__":
     # print(site.prettify())
     img_w_url = find_all_images(test, site)
     # print(img_w_url)
-    # new_links = find_all_links(test, site)
+    new_links = find_all_links(test, site)
+    # print(new_links)
     manager(img_w_url)
