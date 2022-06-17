@@ -69,3 +69,5 @@ if __name__ == "__main__":
     new_links = find_all_links(test, site)
     # print(new_links)
     manager(img_w_url)
+    # TODO  add function/loop that keeps calling manager(need to have more images so need to call find all images
+    #  with one of new links) (get more images with other thread?)
