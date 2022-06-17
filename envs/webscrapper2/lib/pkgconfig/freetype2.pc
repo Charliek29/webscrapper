@@ -1,0 +1,14 @@
+prefix=/Users/charlie/Desktop/webscrapper/envs/webscrapper2
+exec_prefix=/Users/charlie/Desktop/webscrapper/envs/webscrapper2
+libdir=/Users/charlie/Desktop/webscrapper/envs/webscrapper2/lib
+includedir=/Users/charlie/Desktop/webscrapper/envs/webscrapper2/include
+
+Name: FreeType 2
+URL: https://freetype.org
+Description: A free, high-quality, and portable font engine.
+Version: 24.0.18
+Requires:
+Requires.private: 
+Libs: -L${libdir} -lfreetype
+Libs.private: -lz -L/Users/charlie/Desktop/webscrapper/envs/webscrapper2/lib -lpng16 -lz
+Cflags: -I${includedir}/freetype2

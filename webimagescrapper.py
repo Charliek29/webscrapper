@@ -4,6 +4,9 @@ import urllib.parse as urlparse
 import requests
 from fake_useragent import UserAgent
 from random import randint
+from matplotlib import pyplot as plt
+from matplotlib import image as mpimg
+import re
 
 
 def load_website(url: str):
@@ -19,28 +22,20 @@ def load_website(url: str):
 
 def find_all_images(url: str, bs_object: BeautifulSoup):
     print(f'Getting all images from {url[:70]}')
-    imgs = bs_object.find_all('img')
-    images_links = {}
-    alt_set = set()
-
-    for idx, tag in enumerate(imgs):
-        dic = tag.attrs
-        if 'alt' in dic.keys() and tag['alt'] not in alt_set:
-            alt_set.add(tag['alt'])
-            images_links[tag['alt']] = urlparse.urljoin(url, tag['src'])
-        else:
-            images_links[("unlabeled " + str(idx))] = urlparse.urljoin(url, tag['src'])
-    return images_links
+    html = bs_object.prettify()
+    # pat = re.compile(r'<img [^>]*src="([^"]+)')
+    pat = re.compile(r'<img (?:alt)?.*\"(http[\_A-Za-z0-9.\/\-\:\?=]*)\".*\/>')
+    img = pat.findall(html)
+    return img
 
 
 def find_all_links(url: str, bs_object: BeautifulSoup):
-    # TODO add more logic here to check if the links are valid (using requests or another library)
     print(f'Looking for new links from {url[:70]}')
     links = bs_object.find_all('a')
     link_dic = {}
     for tag in links:
-        link = tag['href']
         try:
+            link = tag['href']
             if requests.get(link).status_code == 200:
                 name = tag.text
                 link_dic[name] = link
@@ -49,28 +44,34 @@ def find_all_links(url: str, bs_object: BeautifulSoup):
     return link_dic
 
 
-def display_image(img: str):
-    print(f'loading image from this URL: {img}')
-    response = requests.get(img)
-    file = open("temp_img.png", "wb")
+def display_image(link_to_photo: str):
+    print(f'loading image from this URL: {link_to_photo}')
+    response = requests.get(link_to_photo)
+    file = open("temp_img.jpg", "wb")
     file.write(response.content)
-    sleep(1)
     file.close()
+    try:
+        image = mpimg.imread("temp_img.jpg")
+        plt.imshow(image)
+        plt.show()
+        sleep(1)
+    except:
+        print('Skipping one image')
+    # plt.close('all')
 
 
-def manager(curr_dic: dict):
-    vals = list(curr_dic.values())
-    while len(vals) > 0:
-        choice = randint(0, len(vals)-1)
-        display_image(vals.pop(choice))
+def manager(lst: list):
+    while len(lst) > 0:
+        choice = randint(0, len(lst) - 1)
+        display_image(lst.pop(choice))
 
 
 # make this multi-thread, one for searching for new links, one for getting images, one for viewer of images
 if __name__ == "__main__":
     test = "https://www.google.com"
-    # load_website(test)
     site = load_website(test)
     # print(site.prettify())
     img_w_url = find_all_images(test, site)
-    new_links = find_all_links(test, site)
+    # print(img_w_url)
+    # new_links = find_all_links(test, site)
     manager(img_w_url)
